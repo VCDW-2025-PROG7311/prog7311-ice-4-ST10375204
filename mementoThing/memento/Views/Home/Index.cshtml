@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post" action="@Url.Action("SetContent")">
+    <div>
+        @if (ViewBag.message == null)
+        {
+            <label for="txtEditor">Enter your text:</label>
+            <textarea id="txtEditor" name="txtEditor" rows="4" cols="50">Enter your text here!</textarea>
+        }
+        else
+        {
+            <label for="txtEditor">Enter your text:</label>
+            <textarea id="txtEditor" name="txtEditor" rows="4" onfocus="saveStuff()" onblur="stopSaving()"
+                cols="50">@ViewBag.message</textarea>
+        }
+    </div>
+    <button type="submit" style="display: none;">Save</button>
+</form>
+
+<form method="post" action="@Url.Action("GetContent")">
+    <button type="submit">Undo</button>
+</form>
+
+<script>
+
+    function saveMemento() {
+        var txtEditor = document.getElementById("txtEditor").value;
+
+        fetch('@Url.Action("SetContent")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'txtEditor=' + encodeURIComponent(txtEditor)
+        }).then(response => response.text())
+            .then(data => {
+
+                console.log('Memento saved');
+            })
+            .catch(error => console.error('Error saving memento:', error));
+    }
+
+
+    function saveStuff() {
+
+        interval = setInterval(saveMemento, 1000);
+    }
+    function stopSaving() {
+
+        clearInterval(interval);
+    }
+
+</script>
